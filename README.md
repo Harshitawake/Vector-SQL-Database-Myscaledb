@@ -116,6 +116,7 @@ SELECT appBetLogID,
 FROM app_logs_all_1 
 LIMIT 100;
 ```
+![select statment](Screen_shots/query5.jpg)
 
 # Query command on your table with similarity search and some condition
 
@@ -139,7 +140,7 @@ WHERE distance > 0.5 AND appBetLogID IN [308,309,52]
 ORDER BY distance ASC
 LIMIT 100;
 ```
-
+![select statment](Screen_shots/query4.jpg)
 # Query command on your table with similarity search
 
 ```sql
@@ -161,20 +162,7 @@ FROM app_logs_all_1
 ORDER BY distance ASC
 LIMIT 100;
 ```
-
-# Query to find the closest description
-
-```sql
-SELECT appDescription
-FROM app_logs_all_1
-WHERE appLogCode = 1008
-ORDER BY distance(appDescription_embedding, (
-    SELECT embedding
-    FROM question_embeddings
-    WHERE id = 1
-))
-LIMIT 1;
-```
+![select statment](Screen_shots/query2.jpg)
 
 # Query to find the closest description with distance
 
@@ -188,3 +176,4 @@ FROM app_logs_all_1
 ORDER BY distance ASC
 LIMIT 1;
 ```
+![select statment](Screen_shots/query3.jpg)
