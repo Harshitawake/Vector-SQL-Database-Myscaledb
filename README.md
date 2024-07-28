@@ -41,4 +41,8 @@ CREATE TABLE app_logs_all_1 (
     CONSTRAINT check_length CHECK length(appPlaceBetInfo_embedding) = 384
 )
 ENGINE = MergeTree
-ORDER BY appBetLogID;
+ORDER BY appBetLogID;'''
+
+### Insert Rows to the Table from CSV File
+
+
