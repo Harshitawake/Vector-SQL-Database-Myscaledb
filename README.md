@@ -1,30 +1,43 @@
-# Vector-SQL Database with MyScale
+# Vector-SQL Database with MyScale DB 
 
 ## Introduction
 
 ![myscale db architecture](Screen_shots/myscaledb.jpg)
 
-Vector databases are very popular nowadays. Mostly they are used to store the high-dimensional vector embeddings of unstructured data like text and images. They also allow us to perform semantic searches very efficiently. Long story short, they are better than traditional relational databases for this particular use case.
+Vector databases have gained significant popularity recently, primarily for their ability to store high-dimensional vector embeddings of unstructured data like text and images. These databases excel at performing semantic searches with impressive efficiency, making them superior to traditional relational databases for such use cases.
 
-Recently, I came up with an interesting problem statement where I was given structured data meaning rows and columns containing both numerical as well as categorical features. I had to find a way to store them in a vector database and use it to increase query efficiency.
+Long story short. They are better than traditional relational databases in this particular use case!
 
-After doing my research, I came up with a solution to use a Vector-SQL Database. MyScale database is open-source and is built on another open-source relational database, ClickHouse. So, MyScale leverages the stability and reliability of ClickHouse, which itself uses columnar storage for faster querying but also gives an added advantage to store vector embeddings with the functionality to perform similarity search over them.
+Recently I came across an interesting problem statement involving structured data, consisting of rows and columns with both numerical and categorical features. My challenge was to find an efficient way to store this data in a vector database and enhance query performance.
 
-The best part about this is that we can do all these with SQL queries, allowing us to do more complex queries, unlocking endless possibilities. So technically speaking, we are getting the best of both worlds here.
+Through my research, I discovered an innovative solution: using a Vector-SQL Database. MyScale, an open-source database built on the robust ClickHouse, offers a compelling approach. ClickHouse, renowned for its columnar storage and fast querying capabilities, provides a stable and reliable foundation. MyScale extends this by enabling the storage of vector embeddings and supporting similarity searches.
+
+What makes MyScale particularly impressive is its ability to handle these tasks using SQL queries. This feature allows for complex querying, unlocking a myriad of possibilities, and effectively combining the strengths of vector and relational databases. In essence, MyScale delivers the best of both worlds, offering enhanced query efficiency and powerful search capabilities.
+
 
 Let me show the dataset I was dealing with:
+
 ![myscale db architecture](Screen_shots/dataframe.jpg)
+
+
 ![myscale db architecture](Screen_shots/df_info.jpg)
 
+# After Preprocessing the Data Frame Embeddings looks like this :
 
-I locally set up MyScale, and the results are phenomenal.
+![myscale db architecture](Screen_shots/embeddings.png)
+
+For creating the embeddings we have used a small model ('all-MiniLM-L6-v2') with the SentenceTransformer library.
+Check out this 'myscaledb-DataPreprocessing.ipynb' file in the repo for more info.
+
+I locally set up MyScale db on docker engine, and the results are phenomenal.
 
 Here’s the GitHub repo for the MyScale DB: [MyScaleDB](https://github.com/myscale/MyScaleDB).
 
 Here is my repo: [Vector-SQL-Database-Myscaledb](https://github.com/Harshitawake/Vector-SQL-Database-Myscaledb)
 
-Feel free to look into this:
+Feel free to look into this!
 
+# Some handy SQL commands for setting up the Myscale db: 
 
 # Create Table in Myscale db
 
@@ -81,6 +94,8 @@ FROM file('/var/lib/clickhouse/user_files/outputfull1.csv', 'CSVWithNames');
 ```sql
 ALTER TABLE app_logs_all_1 ADD VECTOR INDEX vec_idx appDescription_embedding TYPE SCANN('metric_type=Cosine');
 ```
+# Screen shots : 
+
 ![myscale db architecture](Screen_shots/myscale_showtables.jpg)
 ![myscale db architecture](Screen_shots/describe.jpg.png)
 # Create another table to store the query
@@ -122,6 +137,8 @@ SELECT appBetLogID,
 FROM app_logs_all_1 
 LIMIT 100;
 ```
+# Screen shots : 
+
 ![select statment](Screen_shots/query5.jpg)
 
 # Query command on your table with similarity search and some condition
@@ -146,6 +163,8 @@ WHERE distance > 0.5 AND appBetLogID IN [308,309,52]
 ORDER BY distance ASC
 LIMIT 100;
 ```
+# Screen shots : 
+
 ![select statment](Screen_shots/query4.jpg)
 # Query command on your table with similarity search
 
@@ -168,6 +187,8 @@ FROM app_logs_all_1
 ORDER BY distance ASC
 LIMIT 100;
 ```
+# Screen shots : 
+
 ![select statment](Screen_shots/query2.jpg)
 
 # Query to find the closest description with distance
@@ -182,4 +203,11 @@ FROM app_logs_all_1
 ORDER BY distance ASC
 LIMIT 1;
 ```
+# Screen shots : 
+
 ![select statment](Screen_shots/query3.jpg)
+
+## Credits
+
+This project utilizes MyScale DB, an open-source database built on ClickHouse. MyScale leverages the stability and reliability of ClickHouse's columnar storage for faster querying while providing the capability to store vector embeddings and perform similarity searches. For more information, visit the MyScale DB repository: [MyScaleDB](https://github.com/myscale/MyScaleDB).
+
