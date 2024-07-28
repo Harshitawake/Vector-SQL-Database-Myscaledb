@@ -9,6 +9,8 @@ Recently, I came up with an interesting problem statement where I was given stru
 After doing my research, I came up with a solution to use a Vector-SQL Database. MyScale database is open-source and is built on another open-source relational database, ClickHouse. So, MyScale leverages the stability and reliability of ClickHouse, which itself uses columnar storage for faster querying but also gives an added advantage to store vector embeddings with the functionality to perform similarity search over them.
 
 The best part about this is that we can do all these with SQL queries, allowing us to do more complex queries, unlocking endless possibilities. So technically speaking, we are getting the best of both worlds here.
+![myscale db architecture](Screen_shots/myscaledb.jpg)
+
 
 I locally set up MyScale, and the results are phenomenal.
 
