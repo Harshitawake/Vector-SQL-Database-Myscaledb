@@ -2,6 +2,8 @@
 
 ## Introduction
 
+![myscale db architecture](Screen_shots/myscaledb.jpg)
+
 Vector databases are very popular nowadays. Mostly they are used to store the high-dimensional vector embeddings of unstructured data like text and images. They also allow us to perform semantic searches very efficiently. Long story short, they are better than traditional relational databases for this particular use case.
 
 Recently, I came up with an interesting problem statement where I was given structured data meaning rows and columns containing both numerical as well as categorical features. I had to find a way to store them in a vector database and use it to increase query efficiency.
@@ -9,16 +11,19 @@ Recently, I came up with an interesting problem statement where I was given stru
 After doing my research, I came up with a solution to use a Vector-SQL Database. MyScale database is open-source and is built on another open-source relational database, ClickHouse. So, MyScale leverages the stability and reliability of ClickHouse, which itself uses columnar storage for faster querying but also gives an added advantage to store vector embeddings with the functionality to perform similarity search over them.
 
 The best part about this is that we can do all these with SQL queries, allowing us to do more complex queries, unlocking endless possibilities. So technically speaking, we are getting the best of both worlds here.
-![myscale db architecture](Screen_shots/myscaledb.jpg)
+
+Let me show the dataset I was dealing with:
+![myscale db architecture](Screen_shots/dataframe.jpg)
+![myscale db architecture](Screen_shots/df_info.jpg)
 
 
 I locally set up MyScale, and the results are phenomenal.
 
-Here’s the GitHub repo for the MyScale DB: [MyScaleDB](https://github.com/myscale/MyScaleDB)
+Here’s the GitHub repo for the MyScale DB: [MyScaleDB](https://github.com/myscale/MyScaleDB).
 
 Here is my repo: [Vector-SQL-Database-Myscaledb](https://github.com/Harshitawake/Vector-SQL-Database-Myscaledb)
 
-Feel free to look into this.
+Feel free to look into this:
 
 
 # Create Table in Myscale db
@@ -76,7 +81,8 @@ FROM file('/var/lib/clickhouse/user_files/outputfull1.csv', 'CSVWithNames');
 ```sql
 ALTER TABLE app_logs_all_1 ADD VECTOR INDEX vec_idx appDescription_embedding TYPE SCANN('metric_type=Cosine');
 ```
-
+![myscale db architecture](Screen_shots/myscale_showtables.jpg)
+![myscale db architecture](Screen_shots/describe.jpg.png)
 # Create another table to store the query
 
 ```sql
