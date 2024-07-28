@@ -1,0 +1,163 @@
+# Create Table in Myscale db
+
+CREATE TABLE app_logs_all_1 (
+    `appBetLogID` INT,
+    `appDescription` TEXT,
+    `appLogCode` INT,
+    `appClientID` INT,
+    `appBetID` INT,
+    `appBetDetailID` FLOAT,
+    `appIsBack` FLOAT,
+    `appRate` FLOAT,
+    `appStake` INT,
+    `appPlaceBetInfo` TEXT,
+    `appIsMasterLimit` FLOAT,
+
+    `appCreatedBy` INT,
+    `appDescription_embedding` Array(Float32),
+    `appPlaceBetInfo_embedding` Array(Float32),
+    CONSTRAINT check_length CHECK length(appDescription_embedding) = 384,
+    CONSTRAINT check_length CHECK length(appPlaceBetInfo_embedding) = 384
+)
+ENGINE = MergeTree
+ORDER BY appBetLogID;
+
+
+
+---------------------------------
+
+# Insert rows to the Table Created from the csv file saved in local
+
+
+INSERT INTO app_logs_all_1 
+SELECT
+    toInt32(appBetLogID),
+    appDescription,
+    toInt32(appLogCode),
+    toInt32(appClientID),
+    toInt32(appBetID),
+    toFloat32(appBetDetailID),
+    toFloat32(appIsBack),
+    toFloat32(appRate),
+    toInt32(appStake),
+    appPlaceBetInfo,
+    toFloat32(appIsMasterLimit),
+
+    toInt32(appCreatedBy),
+    appDescription_embedding,
+    appPlaceBetInfo_embedding
+
+FROM file('/var/lib/clickhouse/user_files/outputfull1.csv', 'CSVWithNames')
+
+-----------------------------------------
+# Create Vector index on embeddings columns
+
+ALTER TABLE app_logs_all_1 ADD VECTOR INDEX vec_idx appDescription_embedding TYPE SCANN('metric_type=Cosine');
+---------------------------------------------------
+
+---------------------------------------------------
+# create another table to store the query
+
+CREATE TABLE question_embeddings (
+    id Int32,
+    question String,
+    embedding Array(Float32),
+    CONSTRAINT check_length CHECK length(embedding) = 384
+
+)
+ENGINE = MergeTree()
+ORDER BY id;
+
+---------------------------------------------------
+# insert the queries from csv file into the table
+
+insert into question_embeddings
+select 
+	id,
+	question,
+	embedding
+from file('/var/lib/clickhouse/user_files/question.csv', 'CSVWithNames')	
+
+---------------------------------------------------
+
+
+
+# Query command on your table
+
+select appBetLogID,
+    appLogCode,
+    appClientID,
+    appBetID,
+    appBetDetailID,
+    appIsBack,
+    appRate,
+    appStake,
+    appIsMasterLimit from app_logs_all_1 limit 100;
+
+---------------------------------
+# Query command on your table with similarity search and some condition.
+
+select appBetLogID,
+    appLogCode,
+    appClientID,
+    appBetID,
+    appBetDetailID,
+    appIsBack,
+    appRate,
+    appStake,
+    appIsMasterLimit,
+    distance(appDescription_embedding, (
+    SELECT embedding
+    FROM question_embeddings
+    WHERE id = 1
+    )) as distance
+ from app_logs_all_1
+where distance >0.5 and appBetLogID in [308,309,52]
+order by distance asc
+ limit 100;
+
+---------------------------------
+select appBetLogID,
+    appLogCode,
+    appClientID,
+    appBetID,
+    appBetDetailID,
+    appIsBack,
+    appRate,
+    appStake,
+    appIsMasterLimit,
+    distance(appDescription_embedding, (
+    SELECT embedding
+    FROM question_embeddings
+    WHERE id = 1
+    )) as distance
+ from app_logs_all_1
+
+order by distance asc
+ limit 100;
+
+-----------------------------------------------
+
+
+SELECT appDescription
+FROM app_logs_all_1
+where appLogCode =1008
+ORDER BY distance(appDescription_embedding, (
+    SELECT embedding
+    FROM question_embeddings
+    WHERE id = 1
+    ))
+LIMIT 1;
+
+---------------------------------------------------
+SELECT appDescription,distance(appDescription_embedding, (
+    SELECT embedding
+    FROM question_embeddings
+    WHERE id = 1)) as distance
+FROM app_logs_all_1
+ORDER by distance  ASC
+LIMIT 1;
+
+
+
+
